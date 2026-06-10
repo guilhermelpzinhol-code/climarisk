@@ -1,73 +1,33 @@
-# React + TypeScript + Vite
+# Climarisk — Agri-Intelligence Prime
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MVP **web responsivo** de gestão de risco climático paramétrico para o agronegócio.
+Foco regional do MVP: **Oeste da Bahia** (Luís Eduardo Magalhães / Barreiras), cultura principal **Soja**.
 
-Currently, two official plugins are available:
+> A Climarisk é provedora de dados e infraestrutura tecnológica — **não é uma seguradora**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
+- Vite + React + TypeScript
+- Tailwind CSS (paleta extraída do protótipo)
+- React Router (rotas com code-splitting / `React.lazy`)
+- lucide-react · dados mockados (localStorage), sem backend
 
-## React Compiler
+## Telas
+Landing · Login por perfil · Dashboard · Map View · Propriedades · Mitigação de Risco (Insurance) ·
+Central de Laudos (Alerts) · Configurações · Perfil.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requisitos Funcionais
+- **RF01** — cadastro/login de usuários por perfil (`/login`)
+- **RF02** — inserção de coordenadas lat/long ao cadastrar propriedade (`/properties`)
+- **RF03** — exportar laudo em PDF (`/alerts`)
+- **RF04** — alertas de gatilho climático (`/alerts`)
+- **RF05** — simulador de gatilhos paramétricos (`/insurance`)
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Rodar localmente
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Deploy (Vercel)
+Importe o repositório na Vercel. O `vercel.json` já contém o rewrite de SPA.
+Framework detectado: **Vite** · Build: `npm run build` · Output: `dist`.
