@@ -115,7 +115,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button onClick={() => setOpen(true)} className="text-brand">
             <Menu size={22} />
           </button>
-          <img src="/logo.png" alt="Climarisk" className="h-7 w-auto" />
+          <img
+            src="/logo.png"
+            alt="Climarisk"
+            className="h-7 w-auto"
+            style={{
+              filter:
+                'brightness(0) saturate(100%) invert(43%) sepia(72%) saturate(560%) hue-rotate(92deg) brightness(93%) contrast(92%)',
+            }}
+          />
           <button className="relative text-brand">
             <Bell size={20} />
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-risk-critical" />
