@@ -312,7 +312,7 @@ export default function Landing() {
       <footer id="contato" className="bg-ink-hero py-14 text-white">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-4">
           <div>
-            <img src="/logo.png" alt="Climarisk" className="h-10 w-auto" />
+            <img src="/logo-v2.png" alt="Climarisk" className="h-10 w-auto" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">
               Mitigando riscos e potencializando resultados no agronegócio do {REGION.name}.
             </p>

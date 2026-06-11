@@ -55,7 +55,7 @@ export default function Login() {
           }}
         />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
-          <img src="/logo.png" alt="Climarisk" className="h-9 w-auto" />
+          <img src="/logo-v2.png" alt="Climarisk" className="h-9 w-auto" />
           <div>
             <h1 className="max-w-md text-4xl font-bold leading-[1.1]">
               Transforme a incerteza climática em vantagem competitiva.

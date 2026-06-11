@@ -125,7 +125,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button onClick={() => setOpen(true)} className="text-brand">
             <Menu size={22} />
           </button>
-          <img src="/logo.png" alt="Climarisk" className="app-logo h-8 w-auto" />
+          <img src="/logo-v2.png" alt="Climarisk" className="app-logo h-8 w-auto" />
           <div className="flex items-center gap-1">
             <button
               onClick={() => { setNotifOpen((v) => !v); setUnread(false); }}
