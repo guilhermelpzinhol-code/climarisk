@@ -17,7 +17,9 @@ import {
   Sprout,
 } from 'lucide-react';
 import { Logo } from './Logo';
+import { Toaster, toast } from './Toaster';
 import { useStore } from '../lib/store';
+import { alerts, riskMeta } from '../lib/data';
 
 const nav = [
   { to: '/dashboard', label: 'Painel', icon: LayoutGrid },
@@ -38,6 +40,8 @@ const mobileNav = [
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unread, setUnread] = useState(true);
   const { userName } = useStore();
   const navigate = useNavigate();
   const initials = (userName || 'Climarisk User')
@@ -96,15 +100,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input className="field pl-10" placeholder="Buscar coordenadas ou propriedades..." />
           </div>
-          <div className="ml-auto flex items-center gap-4">
-            <button className="relative text-body hover:text-ink">
-              <Bell size={19} />
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-risk-critical" />
+          <div className="ml-auto flex items-center gap-3">
+            <button
+              onClick={() => { setNotifOpen((v) => !v); setUnread(false); }}
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-line text-body transition hover:text-brand"
+            >
+              <Bell size={18} />
+              {unread && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-risk-critical" />}
             </button>
-            <button className="text-body hover:text-ink">
-              <HelpCircle size={19} />
+            <button
+              onClick={() => toast('Suporte: nossa equipe responde em até 1 dia útil.')}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-body transition hover:text-brand"
+            >
+              <HelpCircle size={18} />
             </button>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-xs font-semibold text-[#06100C]">
               {initials}
             </div>
           </div>
@@ -115,11 +125,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button onClick={() => setOpen(true)} className="text-brand">
             <Menu size={22} />
           </button>
-          <img src="/logo.png" alt="Climarisk" className="h-8 w-auto" />
-          <button className="relative text-brand">
-            <Bell size={20} />
-            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-risk-critical" />
-          </button>
+          <img src="/logo.png" alt="Climarisk" className="app-logo h-8 w-auto" />
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => { setNotifOpen((v) => !v); setUnread(false); }}
+              className="relative flex h-9 w-9 items-center justify-center text-brand"
+            >
+              <Bell size={20} />
+              {unread && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-risk-critical" />}
+            </button>
+          </div>
         </header>
 
         <main className="px-4 py-6 pb-24 sm:px-6 lg:pb-10">{children}</main>
@@ -145,6 +160,48 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </NavLink>
         ))}
       </nav>
+
+      {/* Painel de notificações */}
+      {notifOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+          <div className="fixed right-3 top-16 z-50 w-[min(92vw,360px)] animate-fade-up overflow-hidden rounded-2xl border border-line bg-surface shadow-lift lg:right-6 lg:top-16">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3">
+              <span className="text-sm font-bold text-ink">Notificações</span>
+              <button onClick={() => setNotifOpen(false)} className="text-muted hover:text-ink">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="max-h-[60vh] divide-y divide-line overflow-y-auto">
+              {alerts.map((a) => {
+                const color = riskMeta[a.level].color;
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => { setNotifOpen(false); navigate('/alerts'); }}
+                    className="flex w-full gap-3 px-4 py-3 text-left transition hover:bg-soft"
+                  >
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: color }} />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-ink">{a.title}</span>
+                      <span className="mt-0.5 line-clamp-2 block text-xs text-body">{a.description}</span>
+                      <span className="mt-1 block text-[11px] text-muted">{a.date} · {a.time}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => { setNotifOpen(false); navigate('/alerts'); }}
+              className="w-full border-t border-line py-3 text-sm font-semibold text-brand transition hover:bg-soft"
+            >
+              Ver central de laudos
+            </button>
+          </div>
+        </>
+      )}
+
+      <Toaster />
     </div>
   );
 }
@@ -166,7 +223,7 @@ function NavItem({
       onClick={onClick}
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-          isActive ? 'bg-brand text-white shadow-soft' : 'text-body hover:bg-soft hover:text-ink'
+          isActive ? 'bg-brand text-[#06100C] shadow-soft' : 'text-body hover:bg-soft hover:text-ink'
         }`
       }
     >

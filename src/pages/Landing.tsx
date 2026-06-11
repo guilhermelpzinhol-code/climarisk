@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { MockMap } from '../components/MockMap';
+import { Toaster } from '../components/Toaster';
+import { useReveal } from '../lib/useReveal';
 import { seedProperties, dataSources, REGION } from '../lib/data';
 
 const solutions = [
@@ -72,6 +74,7 @@ const requisitos = [
 ];
 
 export default function Landing() {
+  useReveal();
   return (
     <div className="relative min-h-screen overflow-hidden bg-base">
       {/* Glows ambientes */}
@@ -88,7 +91,7 @@ export default function Landing() {
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-line/70 bg-base/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
-          <Logo withTagline={false} />
+          <Logo />
           <nav className="hidden items-center gap-8 text-sm font-medium text-body md:flex">
             <a href="#solucoes" className="hover:text-ink">Soluções</a>
             <a href="#tecnologia" className="hover:text-ink">Tecnologia</a>
@@ -142,7 +145,7 @@ export default function Landing() {
       </section>
 
       {/* Faixa de números */}
-      <section className="mx-auto max-w-6xl px-5 pb-6">
+      <section data-reveal className="mx-auto max-w-6xl px-5 pb-6">
         <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
           {[
             { v: '380+', l: 'Propriedades monitoradas' },
@@ -159,7 +162,7 @@ export default function Landing() {
       </section>
 
       {/* Soluções */}
-      <section id="solucoes" className="bg-lavender py-16">
+      <section id="solucoes" data-reveal className="bg-lavender py-16">
         <div className="mx-auto max-w-6xl px-5">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-ink">Soluções para todo o ecossistema</h2>
@@ -182,7 +185,7 @@ export default function Landing() {
       </section>
 
       {/* Monitoramento em tempo real */}
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-2">
+      <section data-reveal className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-2">
         <div>
           <h2 className="text-3xl font-bold text-ink">Monitoramento em Tempo Real</h2>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-body">
@@ -204,22 +207,11 @@ export default function Landing() {
             ))}
           </ul>
         </div>
-        <div className="card overflow-hidden p-3">
-          <div className="mb-3 flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3">
-            <div>
-              <span className="label-mono flex items-center gap-1.5"><Leaf size={12} className="text-brand" /> Fazenda Alvorada</span>
-              <p className="mt-1 text-sm font-medium text-ink">Estresse Hídrico · <span className="text-brand">Baixo</span></p>
-            </div>
-            <div className="h-1.5 w-24 overflow-hidden rounded-full bg-line">
-              <div className="h-full w-1/4 rounded-full bg-brand" />
-            </div>
-          </div>
-          <MockMap properties={seedProperties} height={300} interactive={false} />
-        </div>
+        <NdviPanel />
       </section>
 
       {/* Como funciona — jornada */}
-      <section className="bg-ink-hero py-16 text-white">
+      <section data-reveal className="bg-ink-hero py-16 text-white">
         <div className="mx-auto max-w-6xl px-5">
           <span className="label-mono text-brand-200">Jornada do cliente</span>
           <h2 className="mt-3 text-3xl font-bold">Do cadastro ao acionamento, em três passos</h2>
@@ -241,7 +233,7 @@ export default function Landing() {
       </section>
 
       {/* Tecnologia & Fontes de dados */}
-      <section id="tecnologia" className="mx-auto max-w-6xl px-5 py-16">
+      <section id="tecnologia" data-reveal className="mx-auto max-w-6xl px-5 py-16">
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
             <span className="label-mono text-brand">Tecnologia & Fontes de Dados</span>
@@ -295,7 +287,7 @@ export default function Landing() {
 
       {/* Footer */}
       {/* CTA final */}
-      <section className="mx-auto max-w-6xl px-5 pb-16">
+      <section data-reveal className="mx-auto max-w-6xl px-5 pb-16">
         <div className="relative overflow-hidden rounded-3xl border border-brand/20 bg-gradient-to-br from-brand-50 to-surface p-10 text-center sm:p-14">
           <div
             className="pointer-events-none absolute inset-0 opacity-40"
@@ -322,7 +314,7 @@ export default function Landing() {
           <div>
             <img src="/logo.png" alt="Climarisk" className="h-10 w-auto" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">
-              Agri-Intelligence Prime. Mitigando riscos e potencializando resultados no agronegócio do {REGION.name}.
+              Mitigando riscos e potencializando resultados no agronegócio do {REGION.name}.
             </p>
             <Link to="/login" className="mt-5 inline-flex btn-primary px-4 py-2.5 text-sm">
               Acessar Plataforma <ArrowRight size={15} />
@@ -351,6 +343,67 @@ export default function Landing() {
           </span>
         </div>
       </footer>
+      </div>
+      <Toaster />
+    </div>
+  );
+}
+
+/** Painel didático de NDVI (mapa de calor de vigor vegetativo, animado). */
+function NdviPanel() {
+  const cols = 14;
+  const rows = 8;
+  const cells: { v: number; i: number }[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      // Gradiente de vigor + uma mancha seca no canto inferior direito (didático).
+      const base = 0.45 + 0.4 * Math.sin((c / cols) * 2.2 + r * 0.35);
+      const dry = Math.max(0, 1 - Math.hypot(c - cols * 0.78, r - rows * 0.72) / 5);
+      const v = Math.max(0.05, Math.min(1, base - dry * 0.7));
+      cells.push({ v, i: r * cols + c });
+    }
+  }
+  const ndviColor = (v: number) => {
+    // marrom (seco) → amarelo → verde (vigoroso)
+    if (v < 0.35) return `rgb(${146 - v * 60}, ${90 + v * 120}, 40)`;
+    if (v < 0.6) return `rgb(${230 - (v - 0.35) * 300}, ${190 + (v - 0.35) * 40}, ${40})`;
+    return `rgb(${34 + (1 - v) * 60}, ${163 + (v - 0.6) * 60}, ${74})`;
+  };
+
+  return (
+    <div className="card overflow-hidden p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <span className="label-mono flex items-center gap-1.5">
+            <Leaf size={12} className="text-brand" /> Índice de Vegetação (NDVI)
+          </span>
+          <p className="mt-1 text-sm font-medium text-ink">Fazenda Alvorada · Gleba Norte</p>
+        </div>
+        <span className="animate-count rounded-lg bg-brand-50 px-2.5 py-1 text-sm font-bold text-brand">0,72</span>
+      </div>
+
+      {/* Mapa de calor */}
+      <div className="grid gap-[3px] rounded-xl bg-soft p-2" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+        {cells.map((cell) => (
+          <div
+            key={cell.i}
+            className="ndvi-cell aspect-square rounded-[3px]"
+            style={{ background: ndviColor(cell.v), animationDelay: `${cell.i * 9}ms` }}
+            title={`NDVI ${cell.v.toFixed(2)}`}
+          />
+        ))}
+      </div>
+
+      {/* Legenda */}
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-muted">Seco</span>
+          <span className="h-2 w-28 rounded-full" style={{ background: 'linear-gradient(90deg,#8c5a28,#e6c224,#16a34a)' }} />
+          <span className="text-[11px] text-muted">Vigoroso</span>
+        </div>
+        <span className="inline-flex items-center gap-1.5 text-[11px] text-body">
+          <span className="h-2 w-2 rounded-[2px]" style={{ background: '#8c5a28' }} /> Mancha de estresse hídrico
+        </span>
       </div>
     </div>
   );

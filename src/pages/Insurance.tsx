@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Droplet, Sun, Activity, Landmark, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Droplet, Sun, Activity, Landmark, ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Donut, Meter, RiskBadge } from '../components/primitives';
+import { toast } from '../components/Toaster';
 import { policies, formatBRL } from '../lib/data';
 import type { RiskLevel } from '../lib/types';
 
@@ -61,27 +62,42 @@ export default function Insurance() {
             </div>
 
             <button onClick={simulate} disabled={simulating} className="btn-primary mt-6">
-              {simulating ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <Activity size={16} />}
+              {simulating ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#06100C]/30 border-t-[#06100C]" /> : <Activity size={16} />}
               Simular Gatilhos
             </button>
 
             {result && (
-              <div className="mt-6 animate-fade-up rounded-xl border border-line bg-soft/60 p-5">
+              <div key={`${result.rain}-${result.dry}`} className="mt-6 animate-fade-up rounded-xl border border-line bg-soft/60 p-5">
                 <div className="flex items-center justify-between">
                   <span className="label-mono">Resultado da Simulação</span>
                   <RiskBadge level={result.level} />
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-body">Índice pluviométrico projetado</p>
-                    <p className="font-mono text-2xl font-bold text-ink">{result.rain}<span className="text-sm text-muted"> mm</span></p>
-                    <p className="text-xs text-muted">Gatilho: &lt; 150 mm</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-body">Estresse hídrico estimado</p>
-                    <p className="font-mono text-2xl font-bold text-ink">{result.dry}<span className="text-sm text-muted"> dias</span></p>
-                    <p className="text-xs text-muted">Gatilho: &gt; 15 dias</p>
-                  </div>
+
+                <div className="mt-5 space-y-5">
+                  <GaugeRow
+                    label="Índice pluviométrico projetado"
+                    value={result.rain}
+                    unit="mm"
+                    max={200}
+                    trigger={150}
+                    triggerLabel="Gatilho de déficit: < 150 mm"
+                    breached={result.rain < 150}
+                    invert
+                  />
+                  <GaugeRow
+                    label="Estresse hídrico estimado"
+                    value={result.dry}
+                    unit="dias"
+                    max={25}
+                    trigger={15}
+                    triggerLabel="Gatilho de seca: > 15 dias"
+                    breached={result.dry > 15}
+                  />
+                </div>
+
+                <div className="mt-5 flex items-start gap-2 rounded-lg bg-surface px-3 py-2.5 text-xs leading-relaxed text-body">
+                  <Activity size={14} className="mt-0.5 shrink-0 text-brand" />
+                  <span>{verdict(result.level)}</span>
                 </div>
               </div>
             )}
@@ -124,7 +140,12 @@ export default function Insurance() {
       <div className="card mt-5 overflow-hidden">
         <div className="flex items-center justify-between border-b border-line p-5">
           <span className="label-mono">Contratos Ativos</span>
-          <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand">Ver todos <ArrowRight size={14} /></span>
+          <button
+            onClick={() => toast(`Exibindo ${policies.length} contratos ativos.`)}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-brand hover:text-brand-dark"
+          >
+            Ver todos <ArrowRight size={14} />
+          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-left text-sm">
@@ -160,4 +181,48 @@ export default function Insurance() {
       </div>
     </div>
   );
+}
+
+function GaugeRow({
+  label, value, unit, max, trigger, triggerLabel, breached, invert,
+}: {
+  label: string; value: number; unit: string; max: number; trigger: number;
+  triggerLabel: string; breached: boolean; invert?: boolean;
+}) {
+  const pct = Math.min(100, (value / max) * 100);
+  const triggerPct = Math.min(100, (trigger / max) * 100);
+  const color = breached ? '#F87171' : '#34D399';
+  return (
+    <div>
+      <div className="flex items-end justify-between">
+        <p className="text-sm text-body">{label}</p>
+        <p className="text-2xl font-extrabold tracking-tight text-ink">
+          {value}
+          <span className="ml-0.5 text-sm font-medium text-muted">{unit}</span>
+        </p>
+      </div>
+      <div className="relative mt-2 h-2.5 w-full overflow-visible rounded-full bg-line">
+        <div className="animate-grow h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+        {/* Marcador do gatilho */}
+        <div
+          className="absolute -top-1 h-4.5 w-0.5"
+          style={{ left: `${triggerPct}%`, height: '18px', top: '-4px', background: '#FBBF24' }}
+          title={triggerLabel}
+        />
+      </div>
+      <p className="mt-1.5 flex items-center gap-1.5 text-xs" style={{ color }}>
+        {breached ? <AlertTriangle size={12} /> : <CheckCircle2 size={12} />}
+        {triggerLabel} {invert ? '' : ''}
+        <span className="text-muted">· {breached ? 'gatilho acionável' : 'dentro do seguro'}</span>
+      </p>
+    </div>
+  );
+}
+
+function verdict(level: RiskLevel): string {
+  if (level === 'high' || level === 'critical')
+    return 'Cenário de alto risco: as condições projetadas acionariam a cobertura paramétrica. Recomenda-se contratar proteção com gatilho de déficit hídrico para este talhão.';
+  if (level === 'medium')
+    return 'Risco moderado: os índices ainda estão dentro da faixa de segurança, mas próximos do gatilho. Vale monitorar a evolução diária antes do plantio.';
+  return 'Risco baixo: os parâmetros projetados estão confortavelmente dentro da margem de segurança. Nenhum gatilho de proteção seria acionado neste cenário.';
 }

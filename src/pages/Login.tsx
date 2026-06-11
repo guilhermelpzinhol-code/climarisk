@@ -37,7 +37,7 @@ export default function Login() {
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="relative grid min-h-screen lg:grid-cols-2">
       {/* Painel visual */}
       <aside className="relative hidden overflow-hidden bg-ink-hero lg:block">
         <div
@@ -55,10 +55,9 @@ export default function Login() {
           }}
         />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
-          <img src="/logo.png" alt="Climarisk" className="h-12 w-auto" />
+          <img src="/logo.png" alt="Climarisk" className="h-9 w-auto" />
           <div>
-            <span className="label-mono text-brand-200">Agri-Intelligence Prime</span>
-            <h1 className="mt-4 max-w-md text-4xl font-bold leading-[1.1]">
+            <h1 className="max-w-md text-4xl font-bold leading-[1.1]">
               Transforme a incerteza climática em vantagem competitiva.
             </h1>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
@@ -147,7 +146,7 @@ export default function Login() {
 
           <button type="submit" disabled={loading} className="btn-primary mt-7 w-full">
             {loading ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#06100C]/30 border-t-[#06100C]" />
             ) : (
               <>
                 Entrar na plataforma <ArrowRight size={16} />

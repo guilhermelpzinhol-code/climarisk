@@ -1,5 +1,6 @@
 import { ShieldCheck, Clock, Eye, Download, Snowflake, AlertTriangle, Leaf } from 'lucide-react';
 import { RiskBadge } from '../components/primitives';
+import { toast } from '../components/Toaster';
 import { alerts, riskMeta } from '../lib/data';
 
 export default function Alerts() {
@@ -51,7 +52,7 @@ export default function Alerts() {
           </div>
 
           <div className="no-print mt-5 grid gap-3 sm:grid-cols-2">
-            <button className="btn-ghost"><Eye size={16} /> Visualizar PDF</button>
+            <button onClick={() => toast('Abrindo pré-visualização do laudo…')} className="btn-ghost"><Eye size={16} /> Visualizar PDF</button>
             <button onClick={exportLaudo} className="btn-primary"><Download size={16} /> Baixar Laudo (RF03)</button>
           </div>
         </div>

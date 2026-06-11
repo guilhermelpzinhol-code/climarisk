@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SlidersHorizontal, Code2, CreditCard, Users } from 'lucide-react';
+import { toast } from '../components/Toaster';
 
 const tabs = [
   { id: 'prefs', label: 'Preferências da Plataforma', icon: SlidersHorizontal },
@@ -44,7 +45,7 @@ export default function Settings() {
                 <Select label="Fuso Horário" options={['(GMT-03:00) Brasília', '(GMT-04:00) Manaus']} full />
               </div>
               <div className="mt-6 flex justify-end">
-                <button className="btn-primary">Salvar Preferências</button>
+                <button onClick={() => toast('Preferências salvas com sucesso.')} className="btn-primary">Salvar Preferências</button>
               </div>
             </>
           )}

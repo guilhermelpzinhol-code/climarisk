@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Pencil, Store, Landmark, Bell, MapPin, ShieldCheck, LogOut, ChevronRight } from 'lucide-react';
 import { useStore } from '../lib/store';
+import { toast } from '../components/Toaster';
 
 export default function Profile() {
   const { userName, profile, logout } = useStore();
@@ -33,18 +35,18 @@ export default function Profile() {
       <Section title="Dados Pessoais">
         <Row label="Nome Completo" value={userName || 'Carlos Henrique Mendes'} />
         <Row label="CPF" value="***.456.789-**" />
-        <Row label="Telefone" value="(77) 98765-4321" action="Editar" />
+        <Row label="Telefone" value="(77) 98765-4321" action="Editar" onAction={() => toast('Edição de cadastro disponível na versão completa.')} />
       </Section>
 
       <Section title="Conexões de Parceiros">
         <Partner icon={Store} name="AgroTech Insumos" role="Revenda" status="Conectado" />
-        <Partner icon={Landmark} name="Banco Rural" role="Instituição Financeira" status="Pendente" />
+        <Partner icon={Landmark} name="Banco Rural" role="Instituição Financeira" status="Pendente" onAction={() => toast('Convite reenviado para o Banco Rural.')} />
       </Section>
 
       <Section title="Configurações do App">
-        <Toggle icon={Bell} label="Notificações de Risco" desc="Alertas climáticos severos" on />
-        <LinkRow icon={MapPin} label="Permissões de Localização" />
-        <LinkRow icon={ShieldCheck} label="Segurança e Senha" />
+        <Toggle icon={Bell} label="Notificações de Risco" desc="Alertas climáticos severos" defaultOn />
+        <LinkRow icon={MapPin} label="Permissões de Localização" onClick={() => toast('Permissões de localização: concedidas.')} />
+        <LinkRow icon={ShieldCheck} label="Segurança e Senha" onClick={() => toast('Central de segurança em breve.')} />
         <button onClick={handleLogout} className="flex w-full items-center gap-3 px-1 py-3 text-sm font-semibold text-risk-critical">
           <LogOut size={18} /> Sair da Conta
         </button>
@@ -63,18 +65,18 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </div>
   );
 }
-function Row({ label, value, action }: { label: string; value: string; action?: string }) {
+function Row({ label, value, action, onAction }: { label: string; value: string; action?: string; onAction?: () => void }) {
   return (
     <div className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
       <div>
         <p className="text-xs text-muted">{label}</p>
         <p className="font-medium text-ink">{value}</p>
       </div>
-      {action && <button className="text-sm font-semibold text-brand">{action}</button>}
+      {action && <button onClick={onAction} className="text-sm font-semibold text-brand hover:text-brand-dark">{action}</button>}
     </div>
   );
 }
-function Partner({ icon: Icon, name, role, status }: { icon: typeof Store; name: string; role: string; status: string }) {
+function Partner({ icon: Icon, name, role, status, onAction }: { icon: typeof Store; name: string; role: string; status: string; onAction?: () => void }) {
   const on = status === 'Conectado';
   return (
     <div className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
@@ -83,11 +85,16 @@ function Partner({ icon: Icon, name, role, status }: { icon: typeof Store; name:
         <p className="font-medium text-ink">{name}</p>
         <p className="text-xs text-muted">{role}</p>
       </div>
-      <span className={`chip ${on ? 'bg-brand-50 text-brand' : 'bg-amber-50 text-risk-medium'}`}>{status}</span>
+      {on ? (
+        <span className="chip bg-brand-50 text-brand">{status}</span>
+      ) : (
+        <button onClick={onAction} className="chip bg-amber-500/15 text-risk-medium hover:bg-amber-500/25">Reenviar</button>
+      )}
     </div>
   );
 }
-function Toggle({ icon: Icon, label, desc, on }: { icon: typeof Bell; label: string; desc: string; on?: boolean }) {
+function Toggle({ icon: Icon, label, desc, defaultOn }: { icon: typeof Bell; label: string; desc: string; defaultOn?: boolean }) {
+  const [on, setOn] = useState(!!defaultOn);
   return (
     <div className="flex items-center gap-3 py-3 first:pt-0">
       <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-lavender text-body"><Icon size={18} /></span>
@@ -95,15 +102,19 @@ function Toggle({ icon: Icon, label, desc, on }: { icon: typeof Bell; label: str
         <p className="font-medium text-ink">{label}</p>
         <p className="text-xs text-muted">{desc}</p>
       </div>
-      <span className={`flex h-6 w-11 items-center rounded-full p-1 transition ${on ? 'justify-end bg-brand' : 'justify-start bg-line'}`}>
-        <span className="h-4 w-4 rounded-full bg-surface" />
-      </span>
+      <button
+        onClick={() => setOn((v) => !v)}
+        aria-pressed={on}
+        className={`flex h-6 w-11 items-center rounded-full p-1 transition ${on ? 'justify-end bg-brand' : 'justify-start bg-line'}`}
+      >
+        <span className="h-4 w-4 rounded-full bg-surface shadow" />
+      </button>
     </div>
   );
 }
-function LinkRow({ icon: Icon, label }: { icon: typeof MapPin; label: string }) {
+function LinkRow({ icon: Icon, label, onClick }: { icon: typeof MapPin; label: string; onClick?: () => void }) {
   return (
-    <button className="flex w-full items-center gap-3 py-3">
+    <button onClick={onClick} className="flex w-full items-center gap-3 py-3 transition hover:opacity-80">
       <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-lavender text-body"><Icon size={18} /></span>
       <p className="flex-1 text-left font-medium text-ink">{label}</p>
       <ChevronRight size={18} className="text-muted" />
