@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -86,34 +86,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #36493e;
   background-clip: content-box;
-}
-
-/* Leaflet — tema escuro */
-.leaflet-container {
-  background: #0a1310;
-  font-family: 'Inter', sans-serif;
-}
-.leaflet-control-zoom a {
-  background: #0e1714 !important;
-  color: #ecfdf5 !important;
-  border-color: #1e2c26 !important;
-}
-.leaflet-control-zoom a:hover {
-  background: #141f1a !important;
-  color: #22c55e !important;
-}
-.leaflet-control-attribution {
-  background: rgba(7, 13, 11, 0.7) !important;
-  color: #64776f !important;
-}
-.leaflet-control-attribution a {
-  color: #9fb0aa !important;
-}
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  background: #0e1714;
-  color: #ecfdf5;
-  border: 1px solid #1e2c26;
 }
 
 @media print {
