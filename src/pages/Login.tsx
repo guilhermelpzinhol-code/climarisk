@@ -98,13 +98,13 @@ export default function Login() {
     <div className="relative grid min-h-screen lg:grid-cols-2">
       {/* Painel visual */}
       <aside className="relative hidden overflow-hidden bg-ink-hero lg:block">
-        <div className="absolute inset-0 opacity-25" style={{ background: 'radial-gradient(120% 100% at 80% 0%, #16A34A 0%, transparent 55%)' }} />
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '46px 46px' }}
-        />
+        {/* Foto de plantação verde + overlays escuros para manter a headline branca legível */}
+        <img src="/login-bg.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(115deg, rgba(5,14,10,0.94) 0%, rgba(5,14,10,0.84) 42%, rgba(5,14,10,0.55) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(120% 90% at 85% 0%, rgba(34,197,94,0.28) 0%, transparent 55%)' }} />
+        <div className="absolute inset-x-0 bottom-0 h-1/2" style={{ background: 'linear-gradient(to top, rgba(5,14,10,0.85), transparent)' }} />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
-          <img src="/logo-v2.png" alt="Climarisk" className="h-9 w-auto self-start max-w-[180px]" />
+          <img src="/logo-v2.png" alt="Climarisk" className="h-14 w-auto self-start max-w-[260px]" />
           <div>
             <h1 className="max-w-md text-4xl font-bold leading-[1.1]">
               Transforme a incerteza climática em vantagem competitiva.
