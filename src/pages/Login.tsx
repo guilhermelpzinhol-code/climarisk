@@ -104,7 +104,7 @@ export default function Login() {
           style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '46px 46px' }}
         />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
-          <img src="/logo-v2.png" alt="Climarisk" className="h-9 w-auto" />
+          <img src="/logo-v2.png" alt="Climarisk" className="h-9 w-auto self-start max-w-[180px]" />
           <div>
             <h1 className="max-w-md text-4xl font-bold leading-[1.1]">
               Transforme a incerteza climática em vantagem competitiva.
