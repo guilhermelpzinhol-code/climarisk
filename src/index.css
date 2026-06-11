@@ -49,18 +49,18 @@ body {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-[#06100C] transition-all duration-200 active:scale-[0.97] disabled:opacity-60;
     background-image: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
-    box-shadow: 0 8px 22px -8px rgba(34, 197, 94, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    box-shadow: 0 6px 16px -10px rgba(34, 197, 94, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px -8px rgba(34, 197, 94, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -10px rgba(34, 197, 94, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/50 hover:text-brand;
     box-shadow: 0 2px 8px -4px rgba(0, 0, 0, 0.25);
   }
   .btn-ghost:hover {
-    box-shadow: 0 8px 20px -8px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 6px 16px -10px rgba(34, 197, 94, 0.22);
   }
   .field {
     @apply w-full rounded-xl border border-line bg-soft px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-muted focus:border-brand focus:ring-4 focus:ring-brand/10;
