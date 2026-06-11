@@ -1,22 +1,28 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import type { Session } from '@supabase/supabase-js';
 import type { Profile, Property } from './types';
 import { seedProperties } from './data';
+import { supabase } from './supabase';
 
 interface Store {
+  // Auth
+  session: Session | null;
+  authReady: boolean;
   profile: Profile | null;
   userName: string;
-  login: (profile: Profile, name: string) => void;
-  logout: () => void;
+  email: string;
+  signOut: () => Promise<void>;
+  // Splash de boas-vindas
+  welcome: boolean;
+  triggerWelcome: () => void;
+  clearWelcome: () => void;
+  // Propriedades (mock/local)
   properties: Property[];
   addProperty: (p: Omit<Property, 'id'>) => void;
-  welcome: boolean;
-  clearWelcome: () => void;
 }
 
 const StoreContext = createContext<Store | null>(null);
 
-const LS_PROFILE = 'climarisk:profile';
-const LS_NAME = 'climarisk:name';
 const LS_PROPS = 'climarisk:properties';
 
 function load<T>(key: string, fallback: T): T {
@@ -29,42 +35,53 @@ function load<T>(key: string, fallback: T): T {
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<Profile | null>(() => load<Profile | null>(LS_PROFILE, null));
-  const [userName, setUserName] = useState<string>(() => load<string>(LS_NAME, ''));
-  const [properties, setProperties] = useState<Property[]>(() => load<Property[]>(LS_PROPS, seedProperties));
+  const [session, setSession] = useState<Session | null>(null);
+  const [authReady, setAuthReady] = useState(!supabase); // sem supabase, "pronto" imediatamente
   const [welcome, setWelcome] = useState(false);
+  const [properties, setProperties] = useState<Property[]>(() => load<Property[]>(LS_PROPS, seedProperties));
 
   useEffect(() => {
     localStorage.setItem(LS_PROPS, JSON.stringify(properties));
   }, [properties]);
 
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setAuthReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setAuthReady(true);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const user = session?.user;
+  const meta = (user?.user_metadata ?? {}) as { name?: string; profile?: Profile };
+
   const value = useMemo<Store>(
     () => ({
-      profile,
-      userName,
-      login: (p, name) => {
-        setProfile(p);
-        setUserName(name);
-        setWelcome(true);
-        localStorage.setItem(LS_PROFILE, JSON.stringify(p));
-        localStorage.setItem(LS_NAME, JSON.stringify(name));
+      session,
+      authReady,
+      profile: meta.profile ?? null,
+      userName: meta.name ?? (user?.email ? user.email.split('@')[0] : ''),
+      email: user?.email ?? '',
+      signOut: async () => {
+        await supabase?.auth.signOut();
+        setSession(null);
       },
-      logout: () => {
-        setProfile(null);
-        setUserName('');
-        localStorage.removeItem(LS_PROFILE);
-        localStorage.removeItem(LS_NAME);
-      },
+      welcome,
+      triggerWelcome: () => setWelcome(true),
+      clearWelcome: () => setWelcome(false),
       properties,
       addProperty: (p) =>
         setProperties((prev) => {
           const seq = String(prev.length + 1).padStart(3, '0');
           return [{ ...p, id: `PR-${seq}` }, ...prev];
         }),
-      welcome,
-      clearWelcome: () => setWelcome(false),
     }),
-    [profile, userName, properties, welcome]
+    [session, authReady, welcome, properties, meta.profile, meta.name, user?.email]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

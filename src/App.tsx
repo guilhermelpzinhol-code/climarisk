@@ -5,6 +5,7 @@ import { AppLayout } from './components/AppLayout';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Login = lazy(() => import('./pages/Login'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const MapView = lazy(() => import('./pages/MapView'));
 const Properties = lazy(() => import('./pages/Properties'));
@@ -22,9 +23,10 @@ function Loader() {
 }
 
 function Protected({ children }: { children: React.ReactNode }) {
-  const { profile } = useStore();
+  const { session, authReady } = useStore();
   const location = useLocation();
-  if (!profile) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  if (!authReady) return <Loader />;
+  if (!session) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   return <AppLayout>{children}</AppLayout>;
 }
 
@@ -35,6 +37,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
           <Route path="/map" element={<Protected><MapView /></Protected>} />
           <Route path="/properties" element={<Protected><Properties /></Protected>} />

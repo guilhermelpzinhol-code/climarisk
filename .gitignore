@@ -26,3 +26,8 @@ dist-ssr
 # verification artifacts
 shots/
 shot.mjs
+
+# env (chaves locais)
+.env
+.env.local
+.env.*.local

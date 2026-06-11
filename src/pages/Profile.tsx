@@ -5,12 +5,12 @@ import { useStore } from '../lib/store';
 import { toast } from '../components/Toaster';
 
 export default function Profile() {
-  const { userName, profile, logout } = useStore();
+  const { userName, profile, email, signOut } = useStore();
   const navigate = useNavigate();
   const initials = (userName || 'Carlos Mendes').split(' ').slice(0, 2).map((s) => s[0]).join('').toUpperCase();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await signOut();
     navigate('/');
   }
 
@@ -27,7 +27,7 @@ export default function Profile() {
             </span>
           </div>
           <h1 className="mt-4 text-xl font-bold text-ink">{userName || 'Carlos Mendes'}</h1>
-          <p className="text-sm text-body">{(profile ?? 'produtor')}@climarisk.com.br</p>
+          <p className="text-sm text-body">{email || 'sem e-mail'}</p>
           <span className="chip mt-2 bg-brand-100 text-brand-dark capitalize">{profile ?? 'Produtor Rural'}</span>
         </div>
       </div>
