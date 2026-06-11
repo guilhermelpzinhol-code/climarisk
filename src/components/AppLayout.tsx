@@ -20,20 +20,20 @@ import { Logo } from './Logo';
 import { useStore } from '../lib/store';
 
 const nav = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { to: '/map', label: 'Map View', icon: MapIcon },
-  { to: '/properties', label: 'Properties', icon: Building2 },
-  { to: '/insurance', label: 'Insurance', icon: ShieldCheck },
-  { to: '/alerts', label: 'Alerts', icon: Bell },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/dashboard', label: 'Painel', icon: LayoutGrid },
+  { to: '/map', label: 'Mapa', icon: MapIcon },
+  { to: '/properties', label: 'Propriedades', icon: Building2 },
+  { to: '/insurance', label: 'Proteção', icon: ShieldCheck },
+  { to: '/alerts', label: 'Alertas', icon: Bell },
+  { to: '/settings', label: 'Configurações', icon: Settings },
 ];
 
 const mobileNav = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { to: '/properties', label: 'Properties', icon: Sprout },
-  { to: '/insurance', label: 'Protection', icon: ShieldCheck },
-  { to: '/alerts', label: 'Alerts', icon: Bell, dot: true },
-  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/dashboard', label: 'Painel', icon: LayoutGrid },
+  { to: '/properties', label: 'Áreas', icon: Sprout },
+  { to: '/insurance', label: 'Proteção', icon: ShieldCheck },
+  { to: '/alerts', label: 'Alertas', icon: Bell, dot: true },
+  { to: '/profile', label: 'Perfil', icon: User },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -55,7 +55,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <Logo />
         </button>
         <button onClick={() => navigate('/insurance')} className="btn-primary mt-7 w-full">
-          <BarChart3 size={16} /> Analyze Risk
+          <BarChart3 size={16} /> Analisar Risco
         </button>
         <nav className="mt-6 flex flex-1 flex-col gap-1">
           {nav.map((n) => (
@@ -63,7 +63,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="flex flex-col gap-1 border-t border-line pt-3">
-          <NavItem to="/profile" label="Support" icon={LifeBuoy} />
+          <NavItem to="/profile" label="Suporte" icon={LifeBuoy} />
         </div>
       </aside>
 
@@ -82,7 +82,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {nav.map((n) => (
                 <NavItem key={n.to} {...n} onClick={() => setOpen(false)} />
               ))}
-              <NavItem to="/profile" label="Profile" icon={User} onClick={() => setOpen(false)} />
+              <NavItem to="/profile" label="Perfil" icon={User} onClick={() => setOpen(false)} />
             </nav>
           </aside>
         </div>
@@ -115,7 +115,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button onClick={() => setOpen(true)} className="text-brand">
             <Menu size={22} />
           </button>
-          <img src="/logo.png" alt="Climarisk" className="h-7 w-auto brightness-0 invert" />
+          <img src="/logo.png" alt="Climarisk" className="h-8 w-auto" />
           <button className="relative text-brand">
             <Bell size={20} />
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-risk-critical" />

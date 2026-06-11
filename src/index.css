@@ -28,7 +28,7 @@ body {
 
 @layer components {
   .label-mono {
-    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-muted;
+    @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-muted;
   }
   .card {
     @apply rounded-2xl border border-line bg-surface shadow-card;

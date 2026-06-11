@@ -55,7 +55,7 @@ export default function Login() {
           }}
         />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
-          <img src="/logo.png" alt="Climarisk" className="h-9 w-auto brightness-0 invert" />
+          <img src="/logo.png" alt="Climarisk" className="h-12 w-auto" />
           <div>
             <span className="label-mono text-brand-200">Agri-Intelligence Prime</span>
             <h1 className="mt-4 max-w-md text-4xl font-bold leading-[1.1]">

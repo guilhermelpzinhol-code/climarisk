@@ -6,7 +6,7 @@ export default function MapView() {
   const { properties } = useStore();
   return (
     <div className="mx-auto max-w-7xl animate-fade-up">
-      <h1 className="text-2xl font-bold text-ink sm:text-3xl">Map View</h1>
+      <h1 className="text-2xl font-bold text-ink sm:text-3xl">Mapa</h1>
       <p className="mt-1 text-sm text-body">Camadas ambientais sobrepostas às áreas de produção monitoradas.</p>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_320px]">

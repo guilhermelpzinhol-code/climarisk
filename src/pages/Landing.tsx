@@ -73,9 +73,20 @@ const requisitos = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="relative min-h-screen overflow-hidden bg-base">
+      {/* Glows ambientes */}
+      <div
+        className="pointer-events-none absolute -top-40 right-0 h-[520px] w-[520px] rounded-full opacity-30 blur-3xl"
+        style={{ background: 'radial-gradient(circle, #22C55E 0%, transparent 65%)' }}
+      />
+      <div
+        className="pointer-events-none absolute left-[-10%] top-[40%] h-[480px] w-[480px] rounded-full opacity-20 blur-3xl"
+        style={{ background: 'radial-gradient(circle, #16A34A 0%, transparent 70%)' }}
+      />
+
+      <div className="relative z-10">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-line/70 bg-base/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <Logo withTagline={false} />
           <nav className="hidden items-center gap-8 text-sm font-medium text-body md:flex">
@@ -117,7 +128,7 @@ export default function Landing() {
         {/* Card de monitoramento */}
         <div className="relative animate-fade-up">
           <div className="card overflow-hidden p-3">
-            <MockMap properties={seedProperties} height={360} label="Risco Hídrico — Tempo Real" />
+            <MockMap properties={seedProperties} height={360} interactive={false} />
           </div>
           <div className="absolute -right-3 top-6 z-[1000] hidden rounded-xl border border-line bg-surface px-4 py-3 shadow-lift sm:block">
             <span className="label-mono">Risco Hídrico Atual</span>
@@ -127,6 +138,23 @@ export default function Landing() {
             <span className="label-mono">Anomalia de Temp.</span>
             <p className="mt-1 font-mono text-lg font-bold text-risk-medium">+1.2°C</p>
           </div>
+        </div>
+      </section>
+
+      {/* Faixa de números */}
+      <section className="mx-auto max-w-6xl px-5 pb-6">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
+          {[
+            { v: '380+', l: 'Propriedades monitoradas' },
+            { v: '1.4M', l: 'Hectares sob análise' },
+            { v: '98,2%', l: 'Precisão dos gatilhos' },
+            { v: '24/7', l: 'Varredura de satélite' },
+          ].map((s) => (
+            <div key={s.l} className="bg-surface p-6 text-center">
+              <p className="text-3xl font-extrabold tracking-tight text-brand">{s.v}</p>
+              <p className="mt-1 text-xs text-body">{s.l}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -186,7 +214,7 @@ export default function Landing() {
               <div className="h-full w-1/4 rounded-full bg-brand" />
             </div>
           </div>
-          <MockMap properties={seedProperties} height={300} label="Satélite Multi-Espectral" />
+          <MockMap properties={seedProperties} height={300} interactive={false} />
         </div>
       </section>
 
@@ -266,10 +294,33 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
+      {/* CTA final */}
+      <section className="mx-auto max-w-6xl px-5 pb-16">
+        <div className="relative overflow-hidden rounded-3xl border border-brand/20 bg-gradient-to-br from-brand-50 to-surface p-10 text-center sm:p-14">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{ background: 'radial-gradient(60% 80% at 50% 0%, #22C55E33, transparent 70%)' }}
+          />
+          <div className="relative">
+            <h2 className="mx-auto max-w-2xl text-3xl font-bold text-ink sm:text-4xl">
+              Pronto para transformar risco climático em decisão de negócio?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-sm text-body">
+              Comece pelo Oeste da Bahia. Cadastre suas áreas, acompanhe gatilhos paramétricos e gere laudos
+              rastreáveis — tudo em uma única plataforma.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link to="/login" className="btn-primary">Acessar a plataforma <ArrowRight size={16} /></Link>
+              <a href="#solucoes" className="btn-ghost">Ver as soluções</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <footer id="contato" className="bg-ink-hero py-14 text-white">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-4">
           <div>
-            <img src="/logo.png" alt="Climarisk" className="h-8 w-auto brightness-0 invert" />
+            <img src="/logo.png" alt="Climarisk" className="h-10 w-auto" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">
               Agri-Intelligence Prime. Mitigando riscos e potencializando resultados no agronegócio do {REGION.name}.
             </p>
@@ -300,6 +351,7 @@ export default function Landing() {
           </span>
         </div>
       </footer>
+      </div>
     </div>
   );
 }
