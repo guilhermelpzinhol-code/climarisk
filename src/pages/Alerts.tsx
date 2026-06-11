@@ -17,7 +17,7 @@ export default function Alerts() {
 
       {/* Laudo oficial — printable */}
       <div className="printable card mt-6 overflow-hidden">
-        <div className="border-b border-line bg-gradient-to-br from-brand-50 to-white p-6">
+        <div className="border-b border-line bg-gradient-to-br from-brand-50 to-surface p-6">
           <div className="flex items-start justify-between">
             <div>
               <span className="label-mono">Laudo Oficial</span>

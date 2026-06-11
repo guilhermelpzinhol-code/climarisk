@@ -168,7 +168,7 @@ function AddPropertyModal({ onClose, onAdd }: { onClose: () => void; onAdd: (p: 
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
-        className="w-full max-w-lg animate-fade-up rounded-2xl bg-white p-6 shadow-lift"
+        className="w-full max-w-lg animate-fade-up rounded-2xl bg-surface p-6 shadow-lift"
       >
         <div className="flex items-center justify-between">
           <div>

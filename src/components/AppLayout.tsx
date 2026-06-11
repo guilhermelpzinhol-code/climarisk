@@ -48,9 +48,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#f6f7fb]">
+    <div className="min-h-screen bg-base">
       {/* Sidebar desktop */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-white px-4 py-6 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
         <button onClick={() => navigate('/')} className="px-2 text-left">
           <Logo />
         </button>
@@ -71,7 +71,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setOpen(false)}>
           <div className="absolute inset-0 bg-ink/40" />
-          <aside className="absolute inset-y-0 left-0 w-72 bg-white px-4 py-6" onClick={(e) => e.stopPropagation()}>
+          <aside className="absolute inset-y-0 left-0 w-72 bg-surface px-4 py-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-2">
               <Logo />
               <button onClick={() => setOpen(false)} className="text-muted">
@@ -91,7 +91,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Main */}
       <div className="lg:pl-64">
         {/* Topbar desktop */}
-        <header className="sticky top-0 z-20 hidden items-center gap-4 border-b border-line bg-white/80 px-6 py-3.5 backdrop-blur lg:flex">
+        <header className="sticky top-0 z-20 hidden items-center gap-4 border-b border-line bg-surface/80 px-6 py-3.5 backdrop-blur lg:flex">
           <div className="relative max-w-md flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input className="field pl-10" placeholder="Buscar coordenadas ou propriedades..." />
@@ -111,19 +111,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Mobile header */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-white px-4 py-3 lg:hidden">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface px-4 py-3 lg:hidden">
           <button onClick={() => setOpen(true)} className="text-brand">
             <Menu size={22} />
           </button>
-          <img
-            src="/logo.png"
-            alt="Climarisk"
-            className="h-7 w-auto"
-            style={{
-              filter:
-                'brightness(0) saturate(100%) invert(43%) sepia(72%) saturate(560%) hue-rotate(92deg) brightness(93%) contrast(92%)',
-            }}
-          />
+          <img src="/logo.png" alt="Climarisk" className="h-7 w-auto brightness-0 invert" />
           <button className="relative text-brand">
             <Bell size={20} />
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-risk-critical" />
@@ -134,7 +126,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Bottom nav mobile */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-line bg-white/95 px-2 py-2 backdrop-blur lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-line bg-surface/95 px-2 py-2 backdrop-blur lg:hidden">
         {mobileNav.map((n) => (
           <NavLink
             key={n.to}

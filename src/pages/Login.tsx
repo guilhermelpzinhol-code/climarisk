@@ -81,7 +81,7 @@ export default function Login() {
       </aside>
 
       {/* Formulário */}
-      <main className="flex items-center justify-center bg-white px-6 py-10">
+      <main className="flex items-center justify-center bg-surface px-6 py-10">
         <form onSubmit={submit} className="w-full max-w-md animate-fade-up">
           <div className="lg:hidden">
             <Logo />

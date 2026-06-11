@@ -1,21 +1,34 @@
-import { Layers, Plus, Minus, Crosshair } from 'lucide-react';
-import { riskMeta } from '../lib/data';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { Layers } from 'lucide-react';
+import { riskMeta, REGION } from '../lib/data';
 import type { Property } from '../lib/types';
 
-interface Marker {
-  x: number;
-  y: number;
-  property: Property;
+function pinIcon(color: string) {
+  return L.divIcon({
+    className: 'climarisk-pin',
+    html: `<span style="
+      display:flex;align-items:center;justify-content:center;
+      width:24px;height:24px;border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      background:${color};border:2px solid #fff;
+      box-shadow:0 4px 10px rgba(0,0,0,.5)">
+      <span style="width:7px;height:7px;border-radius:50%;background:#fff;transform:rotate(45deg)"></span>
+    </span>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -22],
+  });
 }
 
 /**
- * Mapa estilizado (SVG/CSS) inspirado no protótipo — terreno verde plano,
- * cursos d'água e marcadores georreferenciados em cores de risco.
- * Sem tiles externos: zero chave de API, deploy 100% confiável.
+ * Mapa real (OpenStreetMap via tiles escuros CartoDB), sem chave de API,
+ * com marcadores georreferenciados por nível de risco. Centrado no Oeste da Bahia.
  */
 export function MockMap({
   properties,
-  height = '100%',
+  height = 400,
   showControls = true,
   label = 'Satélite Multi-Espectral',
 }: {
@@ -24,90 +37,49 @@ export function MockMap({
   showControls?: boolean;
   label?: string;
 }) {
-  // Distribui marcadores de forma estável a partir das coordenadas.
-  const markers: Marker[] = properties.slice(0, 8).map((p, i) => ({
-    property: p,
-    x: 14 + ((Math.abs(p.lng * 53 + i * 91) % 70)),
-    y: 16 + ((Math.abs(p.lat * 47 + i * 67) % 64)),
-  }));
+  const center: [number, number] = [REGION.centerLat, REGION.centerLng];
 
   return (
-    <div
-      className="relative overflow-hidden rounded-2xl border border-line"
-      style={{ height, background: '#dff0e2' }}
-    >
-      {/* Água e relevo */}
-      <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 400 300">
-        <rect width="400" height="300" fill="#d8eede" />
-        <path d="M0 90 Q120 70 200 110 T400 120 V0 H0 Z" fill="#e3f2e8" />
-        <path d="M0 300 Q140 250 240 280 T400 250 V300 Z" fill="#cfe9d6" />
-        {/* Rios */}
-        <path d="M300 0 C290 60 330 110 280 160 S320 250 300 300" fill="none" stroke="#bcd9f2" strokeWidth="6" opacity="0.8" />
-        <path d="M300 0 C290 60 330 110 280 160 S320 250 300 300" fill="none" stroke="#9ec9ec" strokeWidth="4" />
-        <path d="M0 150 C80 140 120 180 200 160 S320 150 400 175" fill="none" stroke="#9ec9ec" strokeWidth="3" opacity="0.7" />
-        {/* Lagos */}
-        <ellipse cx="120" cy="60" rx="14" ry="8" fill="#a9d2f0" />
-        <ellipse cx="350" cy="210" rx="18" ry="11" fill="#a9d2f0" />
-        <ellipse cx="70" cy="230" rx="10" ry="6" fill="#a9d2f0" />
-      </svg>
+    <div className="relative overflow-hidden rounded-2xl border border-line" style={{ height }}>
+      <MapContainer
+        center={center}
+        zoom={8}
+        scrollWheelZoom={false}
+        zoomControl={showControls}
+        attributionControl
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          subdomains="abcd"
+          maxZoom={19}
+        />
+        {properties.map((p) => (
+          <Marker key={p.id} position={[p.lat, p.lng]} icon={pinIcon(riskMeta[p.risk].color)}>
+            <Popup>
+              <div style={{ minWidth: 150 }}>
+                <strong>{p.name}</strong>
+                <br />
+                <span style={{ color: '#9fb0aa', fontSize: 12 }}>{p.location}</span>
+                <br />
+                <span style={{ color: riskMeta[p.risk].color, fontWeight: 600, fontSize: 12 }}>
+                  Risco {riskMeta[p.risk].label}
+                </span>{' '}
+                <span style={{ color: '#9fb0aa', fontSize: 12 }}>· {p.culture}</span>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
 
-      {/* Grade sutil */}
-      <div
-        className="absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-
-      {/* Etiqueta camada */}
-      <div className="absolute left-4 top-4">
-        <div className="flex items-center gap-2 rounded-lg border border-line bg-white/90 px-3 py-2 shadow-card backdrop-blur">
+      {/* Etiqueta de camada */}
+      <div className="pointer-events-none absolute left-3 top-3 z-[1000]">
+        <div className="flex items-center gap-2 rounded-lg border border-line bg-surface/90 px-3 py-2 shadow-card backdrop-blur">
           <Layers size={14} className="text-brand" />
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink">{label}</span>
         </div>
       </div>
-
-      {/* Marcadores */}
-      {markers.map((m) => {
-        const color = riskMeta[m.property.risk].color;
-        return (
-          <div
-            key={m.property.id}
-            className="group absolute -translate-x-1/2 -translate-y-full"
-            style={{ left: `${m.x}%`, top: `${m.y}%` }}
-          >
-            <div className="relative flex flex-col items-center">
-              <div
-                className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white shadow-lift"
-                style={{ background: color }}
-              >
-                <span className="h-2 w-2 rounded-full bg-white" />
-              </div>
-              <div className="h-2 w-2 -mt-1 rotate-45 border-b-2 border-r-2 border-white" style={{ background: color }} />
-              <div className="pointer-events-none absolute bottom-full mb-1 hidden whitespace-nowrap rounded-lg bg-ink px-2.5 py-1.5 text-[11px] font-medium text-white shadow-lift group-hover:block">
-                {m.property.name}
-                <span className="ml-1.5 opacity-70">· {riskMeta[m.property.risk].label}</span>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {showControls && (
-        <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-card transition hover:text-brand">
-            <Plus size={16} />
-          </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-card transition hover:text-brand">
-            <Minus size={16} />
-          </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-brand shadow-card">
-            <Crosshair size={16} />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

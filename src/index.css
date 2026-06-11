@@ -22,8 +22,8 @@ body,
 body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
-  background: #f6f7fb;
-  color: #0f172a;
+  background: #070d0b;
+  color: #ecfdf5;
 }
 
 @layer components {
@@ -31,16 +31,19 @@ body {
     @apply font-mono text-[11px] uppercase tracking-[0.14em] text-muted;
   }
   .card {
-    @apply rounded-2xl border border-line bg-white shadow-card;
+    @apply rounded-2xl border border-line bg-surface shadow-card;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-brand-dark active:scale-[0.98] disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-base transition-all hover:bg-brand-dark hover:text-white active:scale-[0.98] disabled:opacity-50;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-3 text-sm font-semibold text-ink transition-all hover:border-brand/40 hover:text-brand;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-all hover:border-brand/40 hover:text-brand;
   }
   .field {
-    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-muted focus:border-brand focus:ring-4 focus:ring-brand/10;
+    @apply w-full rounded-xl border border-line bg-soft px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-muted focus:border-brand focus:ring-4 focus:ring-brand/10;
+  }
+  .field option {
+    @apply bg-surface text-ink;
   }
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
@@ -52,14 +55,42 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #243029;
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #36493e;
   background-clip: content-box;
+}
+
+/* Leaflet — tema escuro */
+.leaflet-container {
+  background: #0a1310;
+  font-family: 'Inter', sans-serif;
+}
+.leaflet-control-zoom a {
+  background: #0e1714 !important;
+  color: #ecfdf5 !important;
+  border-color: #1e2c26 !important;
+}
+.leaflet-control-zoom a:hover {
+  background: #141f1a !important;
+  color: #22c55e !important;
+}
+.leaflet-control-attribution {
+  background: rgba(7, 13, 11, 0.7) !important;
+  color: #64776f !important;
+}
+.leaflet-control-attribution a {
+  color: #9fb0aa !important;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #0e1714;
+  color: #ecfdf5;
+  border: 1px solid #1e2c26;
 }
 
 @media print {

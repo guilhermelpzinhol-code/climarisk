@@ -73,9 +73,9 @@ const requisitos = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-line/70 bg-white/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <Logo withTagline={false} />
           <nav className="hidden items-center gap-8 text-sm font-medium text-body md:flex">
@@ -98,7 +98,7 @@ export default function Landing() {
           <span className="chip border border-brand/20 bg-brand-50 text-brand">
             <Sparkles size={13} /> <span className="font-mono text-[11px] uppercase tracking-wider">Inteligência climática avançada</span>
           </span>
-          <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] tracking-tight text-ink-hero sm:text-5xl">
+          <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl">
             Infraestrutura digital que conecta <span className="text-brand">clima</span>, produção, crédito e proteção.
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-body">
@@ -119,11 +119,11 @@ export default function Landing() {
           <div className="card overflow-hidden p-3">
             <MockMap properties={seedProperties} height={360} label="Risco Hídrico — Tempo Real" />
           </div>
-          <div className="absolute -right-3 top-6 hidden rounded-xl border border-line bg-white px-4 py-3 shadow-lift sm:block">
+          <div className="absolute -right-3 top-6 z-[1000] hidden rounded-xl border border-line bg-surface px-4 py-3 shadow-lift sm:block">
             <span className="label-mono">Risco Hídrico Atual</span>
             <p className="mt-1 font-mono text-lg font-bold text-brand">Baixo (12%)</p>
           </div>
-          <div className="absolute -left-3 bottom-8 hidden rounded-xl border border-line bg-white px-4 py-3 shadow-lift sm:block">
+          <div className="absolute -left-3 bottom-8 z-[1000] hidden rounded-xl border border-line bg-surface px-4 py-3 shadow-lift sm:block">
             <span className="label-mono">Anomalia de Temp.</span>
             <p className="mt-1 font-mono text-lg font-bold text-risk-medium">+1.2°C</p>
           </div>
@@ -177,7 +177,7 @@ export default function Landing() {
           </ul>
         </div>
         <div className="card overflow-hidden p-3">
-          <div className="mb-3 flex items-center justify-between rounded-xl border border-line bg-white px-4 py-3">
+          <div className="mb-3 flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3">
             <div>
               <span className="label-mono flex items-center gap-1.5"><Leaf size={12} className="text-brand" /> Fazenda Alvorada</span>
               <p className="mt-1 text-sm font-medium text-ink">Estresse Hídrico · <span className="text-brand">Baixo</span></p>
@@ -197,7 +197,7 @@ export default function Landing() {
           <h2 className="mt-3 text-3xl font-bold">Do cadastro ao acionamento, em três passos</h2>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {journey.map((j) => (
-              <div key={j.step} className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+              <div key={j.step} className="rounded-2xl border border-white/10 bg-surface/[0.04] p-6">
                 <div className="flex items-center justify-between">
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-white">
                     <j.icon size={20} />
@@ -225,7 +225,7 @@ export default function Landing() {
             </p>
             <div className="mt-6 space-y-3">
               {dataSources.map((d) => (
-                <div key={d.name} className="flex items-center gap-4 rounded-xl border border-line bg-white p-4">
+                <div key={d.name} className="flex items-center gap-4 rounded-xl border border-line bg-surface p-4">
                   <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand">
                     <Database size={18} />
                   </span>

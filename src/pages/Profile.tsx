@@ -96,7 +96,7 @@ function Toggle({ icon: Icon, label, desc, on }: { icon: typeof Bell; label: str
         <p className="text-xs text-muted">{desc}</p>
       </div>
       <span className={`flex h-6 w-11 items-center rounded-full p-1 transition ${on ? 'justify-end bg-brand' : 'justify-start bg-line'}`}>
-        <span className="h-4 w-4 rounded-full bg-white" />
+        <span className="h-4 w-4 rounded-full bg-surface" />
       </span>
     </div>
   );
