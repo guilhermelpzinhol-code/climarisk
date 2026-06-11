@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { Toaster, toast } from './Toaster';
+import { WelcomeOverlay } from './WelcomeOverlay';
 import { useStore } from '../lib/store';
 import { alerts, riskMeta } from '../lib/data';
 
@@ -42,7 +43,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [unread, setUnread] = useState(true);
-  const { userName } = useStore();
+  const { userName, welcome, clearWelcome } = useStore();
   const navigate = useNavigate();
   const initials = (userName || 'Climarisk User')
     .split(' ')
@@ -202,6 +203,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       <Toaster />
+      {welcome && <WelcomeOverlay name={userName} onDone={clearWelcome} />}
     </div>
   );
 }

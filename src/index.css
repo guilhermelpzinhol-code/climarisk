@@ -144,6 +144,43 @@ body {
   animation: growBar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Welcome splash */
+@keyframes welcomePop {
+  0% { opacity: 0; transform: scale(0.5) rotate(-8deg); }
+  60% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+.welcome-pop { animation: welcomePop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes welcomeRing {
+  0% { opacity: 0.7; transform: scale(0.7); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+.welcome-ring { animation: welcomeRing 2s ease-out infinite; }
+.welcome-sub { animation: fadeUp 0.6s ease 0.25s both; }
+.welcome-name { animation: fadeUp 0.6s ease 0.4s both; }
+.welcome-sub2 { animation: fadeUp 0.6s ease 0.55s both; }
+.welcome-bar { animation: fadeUp 0.6s ease 0.7s both; }
+@keyframes welcomeBarFill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+.welcome-bar-fill { animation: welcomeBarFill 1.7s ease 0.6s both; }
+
+/* Análise: barra de progresso e desenho de linha */
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+.draw-line {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: drawLine 1.6s ease forwards;
+}
+@keyframes scanSweep {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+.scan-sweep { animation: scanSweep 1.2s ease-in-out infinite; }
+
 @keyframes countUp {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }

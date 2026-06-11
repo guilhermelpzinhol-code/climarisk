@@ -1,26 +1,51 @@
-import { useState } from 'react';
-import { Droplet, Sun, Activity, Landmark, ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Droplet, Sun, Activity, Landmark, ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2, Satellite, Cloud, Gauge, Loader2 } from 'lucide-react';
 import { Donut, Meter, RiskBadge } from '../components/primitives';
+import { CountUp } from '../components/CountUp';
 import { toast } from '../components/Toaster';
 import { policies, formatBRL } from '../lib/data';
 import type { RiskLevel } from '../lib/types';
 
+const ANALYSIS_STEPS = [
+  { icon: Satellite, label: 'Coletando imagens de satélite (NDVI)…' },
+  { icon: Cloud, label: 'Cruzando estações INMET e CPTEC/INPE…' },
+  { icon: Droplet, label: 'Modelando déficit hídrico e veranico…' },
+  { icon: Gauge, label: 'Calculando gatilhos paramétricos…' },
+];
+const STEP_MS = 620;
+
 export default function Insurance() {
   const [form, setForm] = useState({ talhao: 'Fazenda Boa Vista, Lote 04', culture: 'Soja (Glycine max)', period: 'Out 2025 - Mar 2026' });
-  const [result, setResult] = useState<{ level: RiskLevel; rain: number; dry: number } | null>(null);
-  const [simulating, setSimulating] = useState(false);
+  const [result, setResult] = useState<{ level: RiskLevel; rain: number; dry: number; score: number } | null>(null);
+  const [phase, setPhase] = useState<'idle' | 'analyzing' | 'done'>('idle');
+  const [step, setStep] = useState(0);
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   function simulate() {
-    setSimulating(true);
-    setTimeout(() => {
-      // Cálculo mock determinístico a partir do nome do talhão.
-      const seed = form.talhao.length + form.period.length;
-      const rain = 80 + (seed % 90);
-      const dry = 6 + (seed % 16);
-      const level: RiskLevel = dry > 15 ? 'high' : dry > 12 ? 'medium' : 'low';
-      setResult({ level, rain, dry });
-      setSimulating(false);
-    }, 700);
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setResult(null);
+    setPhase('analyzing');
+    setStep(0);
+
+    ANALYSIS_STEPS.forEach((_, i) => {
+      timers.current.push(window.setTimeout(() => setStep(i), i * STEP_MS));
+    });
+
+    timers.current.push(
+      window.setTimeout(() => {
+        // Cálculo mock determinístico a partir do talhão/período.
+        const seed = form.talhao.length + form.period.length;
+        const rain = 80 + (seed % 90);
+        const dry = 6 + (seed % 16);
+        const level: RiskLevel = dry > 15 ? 'high' : dry > 12 ? 'medium' : 'low';
+        const score = Math.min(99, Math.round((dry / 25) * 60 + ((150 - Math.min(rain, 150)) / 150) * 40));
+        setResult({ level, rain, dry, score });
+        setPhase('done');
+      }, ANALYSIS_STEPS.length * STEP_MS + 250)
+    );
   }
 
   return (
@@ -61,16 +86,29 @@ export default function Insurance() {
               </div>
             </div>
 
-            <button onClick={simulate} disabled={simulating} className="btn-primary mt-6">
-              {simulating ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#06100C]/30 border-t-[#06100C]" /> : <Activity size={16} />}
-              Simular Gatilhos
+            <button onClick={simulate} disabled={phase === 'analyzing'} className="btn-primary mt-6">
+              {phase === 'analyzing' ? <Loader2 size={16} className="animate-spin" /> : <Activity size={16} />}
+              {phase === 'analyzing' ? 'Analisando…' : phase === 'done' ? 'Simular novamente' : 'Simular Gatilhos'}
             </button>
 
-            {result && (
-              <div key={`${result.rain}-${result.dry}`} className="mt-6 animate-fade-up rounded-xl border border-line bg-soft/60 p-5">
+            {phase === 'analyzing' && <AnalyzingPanel step={step} />}
+
+            {phase === 'done' && result && (
+              <div key={result.score} className="mt-6 animate-fade-up rounded-xl border border-line bg-soft/60 p-5">
                 <div className="flex items-center justify-between">
-                  <span className="label-mono">Resultado da Simulação</span>
+                  <span className="label-mono">Resultado da Análise</span>
                   <RiskBadge level={result.level} />
+                </div>
+
+                {/* Score de risco com número correndo */}
+                <div className="mt-4 flex items-end gap-3">
+                  <CountUp
+                    value={result.score}
+                    duration={1200}
+                    className="text-5xl font-extrabold leading-none tracking-tight"
+                    suffix=""
+                  />
+                  <span className="pb-1 text-sm text-muted">/ 100 índice de risco</span>
                 </div>
 
                 <div className="mt-5 space-y-5">
@@ -82,7 +120,6 @@ export default function Insurance() {
                     trigger={150}
                     triggerLabel="Gatilho de déficit: < 150 mm"
                     breached={result.rain < 150}
-                    invert
                   />
                   <GaugeRow
                     label="Estresse hídrico estimado"
@@ -184,10 +221,10 @@ export default function Insurance() {
 }
 
 function GaugeRow({
-  label, value, unit, max, trigger, triggerLabel, breached, invert,
+  label, value, unit, max, trigger, triggerLabel, breached,
 }: {
   label: string; value: number; unit: string; max: number; trigger: number;
-  triggerLabel: string; breached: boolean; invert?: boolean;
+  triggerLabel: string; breached: boolean;
 }) {
   const pct = Math.min(100, (value / max) * 100);
   const triggerPct = Math.min(100, (trigger / max) * 100);
@@ -197,7 +234,7 @@ function GaugeRow({
       <div className="flex items-end justify-between">
         <p className="text-sm text-body">{label}</p>
         <p className="text-2xl font-extrabold tracking-tight text-ink">
-          {value}
+          <CountUp value={value} duration={1100} />
           <span className="ml-0.5 text-sm font-medium text-muted">{unit}</span>
         </p>
       </div>
@@ -205,16 +242,74 @@ function GaugeRow({
         <div className="animate-grow h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
         {/* Marcador do gatilho */}
         <div
-          className="absolute -top-1 h-4.5 w-0.5"
+          className="absolute -top-1 w-0.5"
           style={{ left: `${triggerPct}%`, height: '18px', top: '-4px', background: '#FBBF24' }}
           title={triggerLabel}
         />
       </div>
       <p className="mt-1.5 flex items-center gap-1.5 text-xs" style={{ color }}>
         {breached ? <AlertTriangle size={12} /> : <CheckCircle2 size={12} />}
-        {triggerLabel} {invert ? '' : ''}
+        {triggerLabel}
         <span className="text-muted">· {breached ? 'gatilho acionável' : 'dentro do seguro'}</span>
       </p>
+    </div>
+  );
+}
+
+/** Painel de carregamento animado da análise (etapas + gráfico desenhando + progresso). */
+function AnalyzingPanel({ step }: { step: number }) {
+  const total = ANALYSIS_STEPS.length;
+  const progress = Math.min(100, Math.round(((step + 1) / total) * 100));
+  // Mini-gráfico que "desenha" durante a análise.
+  const pts = [40, 32, 36, 24, 28, 16, 20, 12, 18, 10];
+  const w = 260;
+  const h = 70;
+  const stepX = w / (pts.length - 1);
+  const line = pts.map((v, i) => `${i * stepX},${v + 8}`).join(' ');
+
+  return (
+    <div className="mt-6 animate-fade-up overflow-hidden rounded-xl border border-line bg-soft/60 p-5">
+      <div className="flex items-center justify-between">
+        <span className="label-mono text-brand">Analisando risco climático</span>
+        <span className="text-sm font-bold text-ink">
+          <CountUp value={progress} duration={500} suffix="%" />
+        </span>
+      </div>
+
+      {/* Gráfico desenhando + varredura */}
+      <div className="relative mt-4 overflow-hidden rounded-lg bg-surface p-3">
+        <svg viewBox={`0 0 ${w} ${h + 16}`} className="h-20 w-full">
+          <defs>
+            <linearGradient id="anFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#22C55E" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <polyline className="draw-line" points={line} fill="none" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <div className="scan-sweep pointer-events-none absolute inset-y-0 left-0 w-16" style={{ background: 'linear-gradient(90deg, transparent, rgba(34,197,94,0.18), transparent)' }} />
+      </div>
+
+      {/* Barra de progresso */}
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-line">
+        <div className="h-full rounded-full bg-brand transition-all duration-500" style={{ width: `${progress}%` }} />
+      </div>
+
+      {/* Etapas */}
+      <div className="mt-4 space-y-2.5">
+        {ANALYSIS_STEPS.map((s, i) => {
+          const done = i < step;
+          const active = i === step;
+          return (
+            <div key={s.label} className={`flex items-center gap-3 text-sm transition ${done || active ? 'text-ink' : 'text-muted'}`}>
+              <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${done ? 'bg-brand text-[#06100C]' : active ? 'bg-brand-50 text-brand' : 'bg-line text-muted'}`}>
+                {done ? <CheckCircle2 size={15} /> : active ? <Loader2 size={15} className="animate-spin" /> : <s.icon size={15} />}
+              </span>
+              {s.label}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

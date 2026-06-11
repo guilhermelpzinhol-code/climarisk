@@ -9,6 +9,8 @@ interface Store {
   logout: () => void;
   properties: Property[];
   addProperty: (p: Omit<Property, 'id'>) => void;
+  welcome: boolean;
+  clearWelcome: () => void;
 }
 
 const StoreContext = createContext<Store | null>(null);
@@ -30,6 +32,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(() => load<Profile | null>(LS_PROFILE, null));
   const [userName, setUserName] = useState<string>(() => load<string>(LS_NAME, ''));
   const [properties, setProperties] = useState<Property[]>(() => load<Property[]>(LS_PROPS, seedProperties));
+  const [welcome, setWelcome] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(LS_PROPS, JSON.stringify(properties));
@@ -42,6 +45,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       login: (p, name) => {
         setProfile(p);
         setUserName(name);
+        setWelcome(true);
         localStorage.setItem(LS_PROFILE, JSON.stringify(p));
         localStorage.setItem(LS_NAME, JSON.stringify(name));
       },
@@ -57,8 +61,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const seq = String(prev.length + 1).padStart(3, '0');
           return [{ ...p, id: `PR-${seq}` }, ...prev];
         }),
+      welcome,
+      clearWelcome: () => setWelcome(false),
     }),
-    [profile, userName, properties]
+    [profile, userName, properties, welcome]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
