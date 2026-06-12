@@ -191,7 +191,7 @@ function getPersona(profile: Profile | null, c: PersonaCtx) {
         { icon: Landmark, label: 'Exposição da carteira', value: compactBRL(exposicao).replace('R$ ', 'R$'), hint: 'crédito rural financiado', tone: 'brand' },
         { icon: Building2, label: 'Operações', value: String(c.count), hint: 'propriedades financiadas', tone: 'ink' },
         { icon: AlertTriangle, label: 'Em risco alto', value: String(c.high), hint: 'garantias sob atenção', tone: 'risk' },
-        { icon: TrendingDown, label: 'Default projetado', value: '3,2%', hint: 'inadimplência estimada', tone: 'medium' },
+        { icon: TrendingDown, label: 'Inadimplência projetada', value: '3,2%', hint: 'estimativa da carteira', tone: 'medium' },
       ] as KpiDef[],
     };
   }
@@ -211,7 +211,7 @@ function getPersona(profile: Profile | null, c: PersonaCtx) {
         { icon: ShieldCheck, label: 'Capital segurado', value: compactBRL(capital).replace('R$ ', 'R$'), hint: 'exposição total', tone: 'brand' },
         { icon: FileText, label: 'Apólices ativas', value: String(policies.length), hint: 'contratos vigentes', tone: 'ink' },
         { icon: AlertTriangle, label: 'Gatilhos próximos', value: '2', hint: 'a 90% do limite', tone: 'risk' },
-        { icon: Percent, label: 'Sinistralidade', value: '41%', hint: 'loss ratio da safra', tone: 'medium' },
+        { icon: Percent, label: 'Sinistralidade', value: '41%', hint: 'índice da safra', tone: 'medium' },
       ] as KpiDef[],
     };
   }

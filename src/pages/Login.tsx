@@ -45,6 +45,8 @@ export default function Login() {
       setError('Autenticação ainda não configurada. Defina as chaves do Supabase.');
       return;
     }
+    if (!email.trim() || !email.includes('@')) { setError('Informe um e-mail válido.'); return; }
+    if (view !== 'forgot' && password.length < 1) { setError('Informe sua senha.'); return; }
     setLoading(true);
     try {
       if (view === 'login') {
@@ -124,7 +126,7 @@ export default function Login() {
 
       {/* Formulário */}
       <main className="flex items-center justify-center bg-surface px-6 py-10">
-        <form onSubmit={submit} className="w-full max-w-md animate-fade-up">
+        <form onSubmit={submit} noValidate className="w-full max-w-md animate-fade-up">
           <div className="lg:hidden"><Logo /></div>
           <h2 className="mt-8 text-2xl font-bold text-ink lg:mt-0">{title}</h2>
           <p className="mt-1.5 text-sm text-body">{subtitle}</p>

@@ -1,17 +1,42 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Pencil, Store, Landmark, Bell, MapPin, ShieldCheck, LogOut, ChevronRight } from 'lucide-react';
+import { Pencil, Store, Landmark, Bell, MapPin, ShieldCheck, LogOut, ChevronRight, Check, KeyRound } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { toast } from '../components/Toaster';
+import { Modal } from '../components/Modal';
+import { supabase } from '../lib/supabase';
 
 export default function Profile() {
-  const { userName, profile, email, signOut } = useStore();
+  const { userName, profile, email, signOut, updateName } = useStore();
   const navigate = useNavigate();
   const initials = (userName || 'Carlos Mendes').split(' ').slice(0, 2).map((s) => s[0]).join('').toUpperCase();
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [novoNome, setNovoNome] = useState('');
+  const [permOpen, setPermOpen] = useState(false);
+  const [secOpen, setSecOpen] = useState(false);
+  const [bancoStatus, setBancoStatus] = useState('Pendente');
 
   async function handleLogout() {
     await signOut();
     navigate('/');
+  }
+
+  function abrirEdicao() {
+    setNovoNome(userName || '');
+    setEditOpen(true);
+  }
+  async function salvarNome() {
+    await updateName(novoNome.trim() || userName);
+    setEditOpen(false);
+    toast('Perfil atualizado com sucesso.');
+  }
+  async function redefinirSenha() {
+    if (supabase && email) {
+      await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+      toast('Enviamos um link para redefinir sua senha.');
+    }
+    setSecOpen(false);
   }
 
   return (
@@ -22,9 +47,9 @@ export default function Profile() {
             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-brand text-2xl font-bold text-white shadow-lift">
               {initials}
             </div>
-            <span className="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-brand text-white">
+            <button onClick={abrirEdicao} aria-label="Editar perfil" className="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-surface bg-brand text-[#06100C]">
               <Pencil size={12} />
-            </span>
+            </button>
           </div>
           <h1 className="mt-4 text-xl font-bold text-ink">{userName || 'Carlos Mendes'}</h1>
           <p className="text-sm text-body">{email || 'sem e-mail'}</p>
@@ -33,26 +58,53 @@ export default function Profile() {
       </div>
 
       <Section title="Dados Pessoais">
-        <Row label="Nome Completo" value={userName || 'Carlos Henrique Mendes'} />
-        <Row label="CPF" value="***.456.789-**" />
-        <Row label="Telefone" value="(77) 98765-4321" action="Editar" onAction={() => toast('Edição de cadastro disponível na versão completa.')} />
+        <Row label="Nome Completo" value={userName || 'Carlos Henrique Mendes'} action="Editar" onAction={abrirEdicao} />
+        <Row label="E-mail" value={email || '—'} />
+        <Row label="Telefone" value="(77) 98765-4321" action="Editar" onAction={abrirEdicao} />
       </Section>
 
       <Section title="Conexões de Parceiros">
         <Partner icon={Store} name="AgroTech Insumos" role="Revenda" status="Conectado" />
-        <Partner icon={Landmark} name="Banco Rural" role="Instituição Financeira" status="Pendente" onAction={() => toast('Convite reenviado para o Banco Rural.')} />
+        <Partner icon={Landmark} name="Banco Rural" role="Instituição Financeira" status={bancoStatus} onAction={() => { setBancoStatus('Reenviado'); toast('Convite reenviado para o Banco Rural.'); }} />
       </Section>
 
       <Section title="Configurações do App">
         <Toggle icon={Bell} label="Notificações de Risco" desc="Alertas climáticos severos" defaultOn />
-        <LinkRow icon={MapPin} label="Permissões de Localização" onClick={() => toast('Permissões de localização: concedidas.')} />
-        <LinkRow icon={ShieldCheck} label="Segurança e Senha" onClick={() => toast('Central de segurança em breve.')} />
+        <LinkRow icon={MapPin} label="Permissões de Localização" onClick={() => setPermOpen(true)} />
+        <LinkRow icon={ShieldCheck} label="Segurança e Senha" onClick={() => setSecOpen(true)} />
         <button onClick={handleLogout} className="flex w-full items-center gap-3 px-1 py-3 text-sm font-semibold text-risk-critical">
           <LogOut size={18} /> Sair da Conta
         </button>
       </Section>
 
-      <p className="mt-6 text-center font-mono text-[11px] text-muted">Versão 2.4.1 (Build 849)</p>
+      <p className="mt-6 text-center text-[11px] text-muted">Versão 2.4.1 (Build 849)</p>
+
+      {/* Editar perfil */}
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Editar perfil"
+        footer={<><button onClick={() => setEditOpen(false)} className="btn-ghost">Cancelar</button><button onClick={salvarNome} className="btn-primary"><Check size={16} /> Salvar</button></>}
+      >
+        <label className="label-mono mb-1.5 block">Nome completo</label>
+        <input className="field" value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Seu nome" />
+        <p className="mt-2 text-xs text-muted">O nome é salvo com segurança na sua conta.</p>
+      </Modal>
+
+      {/* Permissões */}
+      <Modal open={permOpen} onClose={() => setPermOpen(false)} title="Permissões de Localização">
+        <div className="space-y-3">
+          <Toggle icon={MapPin} label="Acesso à localização" desc="Usar GPS para centralizar o mapa nas suas áreas" defaultOn />
+          <Toggle icon={Bell} label="Alertas por proximidade" desc="Avisar quando um risco se aproximar das suas áreas" defaultOn />
+        </div>
+      </Modal>
+
+      {/* Segurança */}
+      <Modal open={secOpen} onClose={() => setSecOpen(false)} title="Segurança e Senha"
+        footer={<><button onClick={() => setSecOpen(false)} className="btn-ghost">Fechar</button><button onClick={redefinirSenha} className="btn-primary"><KeyRound size={16} /> Redefinir senha</button></>}
+      >
+        <p className="text-sm leading-relaxed text-body">
+          Para alterar sua senha, enviaremos um link seguro para <strong className="text-ink">{email || 'seu e-mail'}</strong>.
+          Você define a nova senha pela página de redefinição.
+        </p>
+      </Modal>
     </div>
   );
 }

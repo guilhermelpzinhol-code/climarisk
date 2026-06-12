@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutGrid,
@@ -15,10 +15,15 @@ import {
   X,
   User,
   Sprout,
+  MapPin,
+  Mail,
+  Phone,
+  MessageCircle,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { Toaster, toast } from './Toaster';
 import { WelcomeOverlay } from './WelcomeOverlay';
+import { Modal } from './Modal';
 import { useStore } from '../lib/store';
 import { alerts, riskMeta } from '../lib/data';
 
@@ -43,8 +48,23 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [unread, setUnread] = useState(true);
-  const { userName, welcome, clearWelcome } = useStore();
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const { userName, welcome, clearWelcome, properties } = useStore();
   const navigate = useNavigate();
+
+  const matches = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (t.length < 1) return [];
+    return properties
+      .filter((p) => `${p.name} ${p.culture} ${p.location} ${p.lat},${p.lng}`.toLowerCase().includes(t))
+      .slice(0, 6);
+  }, [q, properties]);
+
+  function goToProperty(id: string) {
+    setQ('');
+    navigate(`/properties?p=${id}`);
+  }
   const initials = (userName || 'Climarisk User')
     .split(' ')
     .slice(0, 2)
@@ -68,7 +88,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="flex flex-col gap-1 border-t border-line pt-3">
-          <NavItem to="/profile" label="Suporte" icon={LifeBuoy} />
+          <button onClick={() => setSupportOpen(true)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-body transition hover:bg-soft hover:text-ink">
+            <LifeBuoy size={18} /> Suporte
+          </button>
         </div>
       </aside>
 
@@ -99,7 +121,29 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-20 hidden items-center gap-4 border-b border-line bg-surface/80 px-6 py-3.5 backdrop-blur lg:flex">
           <div className="relative max-w-md flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-            <input className="field pl-10" placeholder="Buscar coordenadas ou propriedades..." />
+            <input
+              className="field pl-10"
+              placeholder="Buscar propriedades, cultura ou coordenadas…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            {q.trim() && (
+              <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-line bg-surface shadow-lift">
+                {matches.length === 0 ? (
+                  <p className="px-4 py-3 text-sm text-muted">Nenhuma propriedade encontrada.</p>
+                ) : (
+                  matches.map((p) => (
+                    <button key={p.id} onMouseDown={() => goToProperty(p.id)} className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-soft">
+                      <MapPin size={15} className="shrink-0 text-brand" />
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
+                        <span className="block truncate text-xs text-muted">{p.culture} · {p.location}</span>
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
           <div className="ml-auto flex items-center gap-3">
             <button
@@ -110,7 +154,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {unread && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-risk-critical" />}
             </button>
             <button
-              onClick={() => toast('Suporte: nossa equipe responde em até 1 dia útil.')}
+              onClick={() => setSupportOpen(true)}
+              aria-label="Ajuda e suporte"
               className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-body transition hover:text-brand"
             >
               <HelpCircle size={18} />
@@ -204,7 +249,30 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       <Toaster />
       {welcome && <WelcomeOverlay name={userName} onDone={clearWelcome} />}
+
+      <Modal open={supportOpen} onClose={() => setSupportOpen(false)} title="Suporte Climarisk" subtitle="Estamos com você na safra. Fale com a gente:">
+        <div className="space-y-3">
+          <SupportRow icon={MessageCircle} label="Chat com especialista" value="Resposta em até 1 dia útil" onClick={() => { setSupportOpen(false); toast('Chat iniciado — um especialista entrará em contato.'); }} />
+          <a href="mailto:suporte@climarisk.com.br" className="flex items-center gap-3 rounded-xl border border-line p-3 transition hover:border-brand/40">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand"><Mail size={18} /></span>
+            <span><span className="block text-sm font-semibold text-ink">E-mail</span><span className="block text-xs text-muted">suporte@climarisk.com.br</span></span>
+          </a>
+          <a href="https://wa.me/5577900000000" target="_blank" rel="noopener" className="flex items-center gap-3 rounded-xl border border-line p-3 transition hover:border-brand/40">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand"><Phone size={18} /></span>
+            <span><span className="block text-sm font-semibold text-ink">WhatsApp</span><span className="block text-xs text-muted">(77) 90000-0000</span></span>
+          </a>
+        </div>
+      </Modal>
     </div>
+  );
+}
+
+function SupportRow({ icon: Icon, label, value, onClick }: { icon: typeof Mail; label: string; value: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="flex w-full items-center gap-3 rounded-xl border border-line p-3 text-left transition hover:border-brand/40">
+      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand"><Icon size={18} /></span>
+      <span><span className="block text-sm font-semibold text-ink">{label}</span><span className="block text-xs text-muted">{value}</span></span>
+    </button>
   );
 }
 

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
@@ -20,7 +21,17 @@ import {
 import { Logo } from '../components/Logo';
 import { MockMap } from '../components/MockMap';
 import { Toaster } from '../components/Toaster';
+import { Modal } from '../components/Modal';
 import { useReveal } from '../lib/useReveal';
+
+const INFO_TEXTS: Record<string, string> = {
+  'Sobre Nós': 'A Climarisk é uma AgTech de inteligência climática focada no Oeste da Bahia. Conectamos clima, produção, crédito e proteção em uma única infraestrutura de dados.',
+  Carreiras: 'Estamos crescendo! Envie seu currículo para pessoas@climarisk.com.br e venha construir o futuro da gestão de risco no agronegócio.',
+  Imprensa: 'Para assuntos de imprensa e materiais institucionais, fale com imprensa@climarisk.com.br.',
+  'Termos de Uso': 'Ambiente de demonstração (MVP acadêmico). Os dados são ilustrativos e não constituem recomendação financeira ou de seguro.',
+  'Política de Privacidade': 'Respeitamos a LGPD. Coletamos apenas os dados necessários para o monitoramento das áreas e nunca compartilhamos sem consentimento.',
+  'Segurança de Dados': 'Usamos autenticação segura (Supabase) e fontes de dados redundantes (INMET, CPTEC/INPE, satélite) com rastreabilidade das ocorrências.',
+};
 import { seedProperties, dataSources, REGION } from '../lib/data';
 
 const solutions = [
@@ -55,7 +66,7 @@ const journey = [
     icon: Activity,
     step: '02',
     title: 'Monitoramento diário em lote',
-    text: 'O sistema vincula a área ao lote de varredura batch e cruza dados de satélite e estações todos os dias.',
+    text: 'O sistema vincula a área ao lote de varredura diária e cruza dados de satélite e estações todos os dias.',
   },
   {
     icon: Bell,
@@ -75,6 +86,15 @@ const requisitos = [
 
 export default function Landing() {
   useReveal();
+  const [info, setInfo] = useState<string | null>(null);
+
+  function handleFooter(item: string) {
+    const toSolucoes = ['Para Produtores', 'Para Bancos', 'Para Cooperativas', 'Para Seguradoras'];
+    if (toSolucoes.includes(item)) return document.getElementById('solucoes')?.scrollIntoView({ behavior: 'smooth' });
+    if (item === 'Contato') return document.getElementById('contato')?.scrollIntoView({ behavior: 'smooth' });
+    if (INFO_TEXTS[item]) return setInfo(item);
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-base">
       {/* Glows ambientes */}
@@ -279,7 +299,7 @@ export default function Landing() {
               ))}
             </ul>
             <div className="mt-6 flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-xs text-brand-dark">
-              <Check size={15} /> Varredura diária em lote (batch) para reduzir custos de API e garantir rastreabilidade.
+              <Check size={15} /> Varredura diária em lote para reduzir custos de API e garantir rastreabilidade.
             </div>
           </div>
         </div>
@@ -329,7 +349,9 @@ export default function Landing() {
               <span className="label-mono text-white/40">{col.h}</span>
               <ul className="mt-4 space-y-2.5 text-sm text-white/70">
                 {col.items.map((i) => (
-                  <li key={i} className="cursor-pointer transition hover:text-white">{i}</li>
+                  <li key={i}>
+                    <button onClick={() => handleFooter(i)} className="text-left transition hover:text-white">{i}</button>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -338,12 +360,17 @@ export default function Landing() {
         <div className="mx-auto mt-12 flex max-w-6xl flex-col items-center justify-between gap-2 border-t border-white/10 px-5 pt-6 text-xs text-white/40 sm:flex-row">
           <span>© 2026 Climarisk. Todos os direitos reservados.</span>
           <span className="flex gap-5">
-            <span className="cursor-pointer hover:text-white">LinkedIn</span>
-            <span className="cursor-pointer hover:text-white">Twitter</span>
+            <a href="https://www.linkedin.com" target="_blank" rel="noopener" className="hover:text-white">LinkedIn</a>
+            <a href="https://x.com" target="_blank" rel="noopener" className="hover:text-white">X</a>
           </span>
         </div>
       </footer>
       </div>
+
+      <Modal open={!!info} onClose={() => setInfo(null)} title={info ?? ''}>
+        <p className="text-sm leading-relaxed text-body">{info ? INFO_TEXTS[info] : ''}</p>
+      </Modal>
+
       <Toaster />
     </div>
   );

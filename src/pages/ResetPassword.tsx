@@ -37,7 +37,7 @@ export default function ResetPassword() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-base px-6">
-      <form onSubmit={submit} className="w-full max-w-md animate-fade-up">
+      <form onSubmit={submit} noValidate className="w-full max-w-md animate-fade-up">
         <div className="flex flex-col items-center text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-dark text-[#06100C]">
             <KeyRound size={26} />

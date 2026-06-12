@@ -3,7 +3,8 @@ import { Droplet, Sun, Activity, Landmark, ShieldCheck, ArrowRight, AlertTriangl
 import { Donut, Meter, RiskBadge } from '../components/primitives';
 import { CountUp } from '../components/CountUp';
 import { toast } from '../components/Toaster';
-import { policies, formatBRL } from '../lib/data';
+import { useStore } from '../lib/store';
+import { formatBRL } from '../lib/data';
 import type { RiskLevel } from '../lib/types';
 
 const ANALYSIS_STEPS = [
@@ -15,6 +16,7 @@ const ANALYSIS_STEPS = [
 const STEP_MS = 620;
 
 export default function Insurance() {
+  const { policies, addPolicy } = useStore();
   const [form, setForm] = useState({ talhao: 'Fazenda Boa Vista, Lote 04', culture: 'Soja (Glycine max)', period: 'Out 2025 - Mar 2026' });
   const [result, setResult] = useState<{ level: RiskLevel; rain: number; dry: number; score: number } | null>(null);
   const [phase, setPhase] = useState<'idle' | 'analyzing' | 'done'>('idle');
@@ -136,6 +138,18 @@ export default function Insurance() {
                   <Activity size={14} className="mt-0.5 shrink-0 text-brand" />
                   <span>{verdict(result.level)}</span>
                 </div>
+
+                <button
+                  onClick={() => {
+                    const capital = 800000 + result.dry * 60000;
+                    const culturaNome = form.culture.split(' (')[0];
+                    addPolicy({ partner: 'Climarisk Parceiros', coverage: 'Paramétrico — Déficit Hídrico', capital, asset: culturaNome, region: 'Oeste da Bahia' });
+                    toast('Proposta enviada — apólice criada como Pendente. Veja em Contratos.');
+                  }}
+                  className="btn-primary mt-4 w-full"
+                >
+                  <ShieldCheck size={16} /> Solicitar proteção para este cenário
+                </button>
               </div>
             )}
           </div>
@@ -195,7 +209,11 @@ export default function Insurance() {
             </thead>
             <tbody>
               {policies.map((p) => (
-                <tr key={p.id} className="border-b border-line last:border-0 hover:bg-soft/60">
+                <tr
+                  key={p.id}
+                  onClick={() => toast(`${p.partner} · ${p.coverage} · ${formatBRL(p.capital)} (${p.status === 'pending' ? 'Pendente' : 'Ativo'})`)}
+                  className="cursor-pointer border-b border-line last:border-0 hover:bg-soft/60"
+                >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-lavender text-body">
@@ -204,11 +222,15 @@ export default function Insurance() {
                       <span className="font-semibold text-ink">{p.partner}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-4 font-mono text-body">{p.id}</td>
+                  <td className="px-5 py-4 text-body">{p.id}</td>
                   <td className="px-5 py-4 text-body">{p.coverage}</td>
-                  <td className="px-5 py-4 font-mono font-semibold text-ink">{formatBRL(p.capital)}</td>
+                  <td className="px-5 py-4 font-semibold text-ink">{formatBRL(p.capital)}</td>
                   <td className="px-5 py-4">
-                    <span className="chip bg-brand-50 text-brand"><span className="h-1.5 w-1.5 rounded-full bg-brand" /> Ativo</span>
+                    {p.status === 'pending' ? (
+                      <span className="chip bg-amber-500/15 text-risk-medium"><span className="h-1.5 w-1.5 rounded-full bg-risk-medium" /> Pendente</span>
+                    ) : (
+                      <span className="chip bg-brand-50 text-brand"><span className="h-1.5 w-1.5 rounded-full bg-brand" /> Ativo</span>
+                    )}
                   </td>
                 </tr>
               ))}
